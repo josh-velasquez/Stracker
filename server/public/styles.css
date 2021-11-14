@@ -1,0 +1,14 @@
+body {
+  background-color: #2f243a;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.contact {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  padding-top: 10%;
+  justify-content: space-evenly;
+}

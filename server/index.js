@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const path = require("path");
 const cors = require("cors");
 const axios = require("axios");
 const serverPort = 6060;
@@ -9,7 +10,16 @@ app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const config = require("./config.json");
+
+const dir = path.join(__dirname, "public");
+app.use(express.static(dir));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 //#endregion
+
+app.get("/", (req, res) => {
+  res.sendFile(dir + "/index.html");
+});
 
 //#region Yahoo Finance
 
@@ -164,6 +174,8 @@ function buildStocksUrl(
     alphaVantageApiKey;
   return url;
 }
+
+function validateTicker(ticker) {}
 
 function buildExchangeRateUrl(queryFunction, fromCurrency, toCurrency) {
   var url =
