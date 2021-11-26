@@ -28,6 +28,7 @@ const yhFinanceHost = "yh-finance.p.rapidapi.com";
 const yhFinanceApiKey = config.yhFinanceApiKey;
 
 app.get("/yhfinance/stocks/summary", (req, res) => {
+  console.log("Server Request: Yahoo Finance Summary")
   var symbol = req.query.symbol.toUpperCase();
   var options = {
     method: "GET",
@@ -73,16 +74,17 @@ app.get("/alphavantage/crypto/add-watch", (req, res) => {
   CRYPTO_WATCH.push(symbol);
 });
 
-app.delete("/alphavantage/crypto/delete-watch", (_, res) => {});
+app.delete("/alphavantage/crypto/delete-watch", (_, res) => { });
 
 app.get("/alphavantage/crypto/currency-exchange-rate", (req, res) => {
+  console.log("Server Request: Alpha Vantage Summary")
   var fromCurrency = req.query.fromCurrency.toUpperCase();
   var toCurrency = req.query.toCurrency.toUpperCase();
   console.log(
     "Server Request (CRYPTO): Currency_Exchange_Rate=" +
-      fromCurrency +
-      " to " +
-      toCurrency
+    fromCurrency +
+    " to " +
+    toCurrency
   );
   var url = buildExchangeRateUrl(
     CRYPTO_FUNCTIONS.CURRENCY_EXCHANGE_RATE,
@@ -175,7 +177,7 @@ function buildStocksUrl(
   return url;
 }
 
-function validateTicker(ticker) {}
+function validateTicker(ticker) { }
 
 function buildExchangeRateUrl(queryFunction, fromCurrency, toCurrency) {
   var url =
