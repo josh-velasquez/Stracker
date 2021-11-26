@@ -53,6 +53,12 @@ body {
   background-color: #232125;
 }
 
+.current-time {
+  height: 100px;
+  display: flex;
+  flex-direction: row;
+}
+
 .statistics {
   margin-top: 20px;
   align-items: center;
