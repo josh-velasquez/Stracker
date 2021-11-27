@@ -18,6 +18,9 @@ function alphaVantageClick() {
     sendRequest(completeUrl);
 }
 
+var hourTimer = document.getElementById("hourTimer");
+hourTimer.innerHTML = "TEST"
+
 function stockTimer() {
     // Set the date we're counting down to
     var countDownDate = new Date("Jan 5, 2022 15:37:25").getTime();
@@ -36,13 +39,13 @@ function stockTimer() {
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        var hour = document.getElementById("hour-timer p");
-        hour = hours + "H";
-
+        // hour.innerHTML = hours + "H";
+        var testing = document.getElementById("testing");
+        testing.innerHTML = hours + "H";
         // Display the result in the element with id="demo"
-        var test =  hours + "h "
-        + minutes + "m " + seconds + "s ";
-        console.log("HERE: " + test)
+        // var test =  hours + "h "
+        // + minutes + "m " + seconds + "s ";
+        // console.log("HERE: " + test)
 
         // If the count down is finished, write some text
         if (distance < 0) {

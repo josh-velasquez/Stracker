@@ -53,10 +53,18 @@ body {
   background-color: #232125;
 }
 
-.current-time {
+.stock-timer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+
+}
+
+.timer {
   height: 100px;
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
 
 .statistics {
