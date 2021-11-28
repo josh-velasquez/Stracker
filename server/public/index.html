@@ -20,30 +20,25 @@
 
 <body>
   <div class="banner">
-    <h1>Stracker</h1>
+    Stracker
   </div>
   <div class="stock-timer">
-    <div class="timer">
-      <div class="hour">
-        H
-      </div>
-      <div class="minutes">
-        M
-      </div>
-      <div class="seconds">
-        S
-      </div>
+    <div class="clock">
+      <ul>
+        <li><span id="hours"></span>Hours</li>
+        <li><span id="minutes"></span>Minutes</li>
+        <li><span id="seconds"></span>Seconds</li>
+      </ul>
     </div>
-    <div class="timer">
-      <div class="timer-hour">
-        H
-      </div>
-      <div class="timer-minutes">
-        M
-      </div>
-      <div class="timer-seconds">
-        S
-      </div>
+    <div id="stock-market-status">
+      STOCK MARKET IS CLOSED
+    </div>
+    <div class="clock" id="stock-clock">
+      <ul>
+        <li><span id="timer-hour"></span>Hours</li>
+        <li><span id="timer-minutes"></span>Minutes</li>
+        <li><span id="timer-seconds"></span>Seconds</li>
+      </ul>
     </div>
   </div>
   <div class="container input-group mb-3">
@@ -85,25 +80,23 @@
 
     <div class="input-group mb-3">
       <span class="input-group-text" id="inputGroup-sizing-default">Email</span>
-      <input type="text" class="form-control" aria-label="Sizing example input"
+      <input type="text" class="form-control" placeholder="email@example.com" aria-label="Sizing example input"
         aria-describedby="inputGroup-sizing-default" id="email">
     </div>
     <button class="btn btn-outline-secondary mx-auto" onclick="onRegisterClick()" type="button">Register</button>
   </div>
 
-  </div>
-
   <div class="statistics-field">
-    <h3>Statistics</h3>
+    <h3 style="padding-top: 50px;">Statistics</h3>
     <div class="statistics">
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Symbol</span>
-        <input type="text" class="form-control" placeholder="$" id="symbol" aria-label="Name"
+        <input type="text" class="form-control" placeholder="Stock Ticker" id="symbol" aria-label="Name"
           aria-describedby="basic-addon1">
       </div>
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Name</span>
-        <input type="text" class="form-control" placeholder="$" id="stockName" aria-label="Name"
+        <input type="text" class="form-control" placeholder="Stock Name" id="stockName" aria-label="Name"
           aria-describedby="basic-addon1">
       </div>
       <div class="input-group mb-3">
@@ -118,12 +111,12 @@
       </div>
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Exchange</span>
-        <input type="text" class="form-control" placeholder="$" id="exchange" aria-label="Exchange"
+        <input type="text" class="form-control" placeholder="Stock exchange" id="exchange" aria-label="Exchange"
           aria-describedby="basic-addon1">
       </div>
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Summary</span>
-        <input type="text" class="form-control" placeholder="$" id="summary" aria-label="Exchange"
+        <input type="text" class="form-control" placeholder="Summary of company" id="summary" aria-label="Exchange"
           aria-describedby="basic-addon1">
       </div>
     </div>

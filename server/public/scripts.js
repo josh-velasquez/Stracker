@@ -1,6 +1,19 @@
 const rootUrl = "http://localhost:6060/"
 
+// Timer for when stocks are open till
+var timerHours = document.getElementById("timer-hour");
+var timerMinutes = document.getElementById("timer-minutes");
+var timerSeconds = document.getElementById("timer-seconds");
+var stockMarketStatus = document.getElementById("stock-market-status");
+var stockMarketTimer = document.getElementById("stock-clock");
+
+// Time
+var clockHour = document.getElementById("hours");
+var clockMinutes = document.getElementById("minutes");
+var clockSeconds = document.getElementById("seconds");
+
 stockTimer();
+clock();
 
 function yahooFinanceClick() {
     console.log("Yahoo Finance");
@@ -18,41 +31,53 @@ function alphaVantageClick() {
     sendRequest(completeUrl);
 }
 
-var hourTimer = document.getElementById("hourTimer");
-hourTimer.innerHTML = "TEST"
+function clock() {
+    setInterval(function () {
+        var today = new Date();
+        var hour = today.getHours();
+        var minutes = today.getMinutes();
+        var seconds = today.getSeconds();
+        clockHour.innerHTML = padTime(hour);
+        clockMinutes.innerHTML = padTime(minutes);
+        clockSeconds.innerHTML = padTime(seconds);
+    }, 1000);
+}
+
+function startStockMarketTimer(open) {
+    if (open) {
+        stockMarketStatus.style.display = "none";
+    } else {
+        stockMarketStatus.style.display = "block";
+        stockMarketTimer.style.display = "none";
+    }
+}
 
 function stockTimer() {
-    // Set the date we're counting down to
-    var countDownDate = new Date("Jan 5, 2022 15:37:25").getTime();
-
-    // Update the count down every 1 second
+    var currentDateTime = new Date();
+    var countDownDate = new Date(currentDateTime.getMonth() + " " + currentDateTime.getDate() + " " + currentDateTime.getFullYear() + " 14:00:00").getTime();
+    if (currentDateTime.getTime() > countDownDate) {
+        startStockMarketTimer(false)
+        return;
+    }
+    startStockMarketTimer(true)
     var x = setInterval(function () {
-
-        // Get today's date and time
         var now = new Date().getTime();
-
-        // Find the distance between now and the count down date
         var distance = countDownDate - now;
-
-        // Time calculations for days, hours, minutes and seconds
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        // hour.innerHTML = hours + "H";
-        var testing = document.getElementById("testing");
-        testing.innerHTML = hours + "H";
-        // Display the result in the element with id="demo"
-        // var test =  hours + "h "
-        // + minutes + "m " + seconds + "s ";
-        // console.log("HERE: " + test)
-
-        // If the count down is finished, write some text
+        timerHours.innerHTML = padTime(hours);
+        timerMinutes.innerHTML = padTime(minutes);
+        timerSeconds.innerHTML = padTime(seconds);
         if (distance < 0) {
+            startStockMarketTimer(false)
             clearInterval(x);
-            document.getElementById("demo").innerHTML = "EXPIRED";
         }
     }, 1000);
+}
+
+function padTime(t) {
+    return (t < 10 ? "0" : "") + t;
 }
 
 function processStatistics(response) {
