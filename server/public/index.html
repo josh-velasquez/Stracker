@@ -45,6 +45,15 @@
     <input type="text" class="form-control" placeholder="Ticker Symbol" id="tickerSymbol" aria-label="Ticker Symbol"
       aria-describedby="basic-addon2">
     <div class="input-group-append">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="exchangeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Exchange
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <a class="dropdown-item" href="#">TSX</a>
+          <a class="dropdown-item" href="#">NASDAQ</a>
+        </div>
+      </div>
       <button class="btn btn-outline-secondary" onclick="yahooFinanceClick()" type="button">Yahoo Finance</button>
       <button class="btn btn-outline-secondary" onclick="alphaVantageClick()" type="button">Alpha Vantage</button>
     </div>
