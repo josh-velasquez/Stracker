@@ -3,6 +3,7 @@ const app = express();
 const path = require("path");
 const cors = require("cors");
 const axios = require("axios");
+const nodemailer = require("nodemailer");
 const serverPort = 6060;
 
 //#region Setup
@@ -17,9 +18,47 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //#endregion
 
-app.get("/", (req, res) => {
+automatedEmailNotification();
+
+app.get("/", (_, res) => {
   res.sendFile(dir + "/index.html");
 });
+
+function automatedEmailNotification() {
+
+}
+
+//#region Email sender
+const email = config.strackerEmail;
+const password = config.strackerPassword;
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: email,
+    pass: password,
+  },
+});
+
+app.post("/notifications/email", (req, res) => {
+  console.log("Server Request: Email Notification");
+  console.log("EMAIL: " + req.body.email)
+  console.log("Message: " + req.body.message)
+  var mail = {
+    from: email,
+    to: req.body.email,
+    subject: "Project Stracker - Automated Email",
+    text: req.body.message,
+  };
+  transporter.sendMail(mail, (error, _) => {
+    if (error) {
+      res.status(500).send("Failed to send email: " + error);
+    } else {
+      res.status(200).send("Email sent.");
+    }
+  });
+})
+//#endregion
+
 
 //#region Yahoo Finance
 

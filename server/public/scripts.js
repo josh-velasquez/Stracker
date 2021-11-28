@@ -20,7 +20,7 @@ function yahooFinanceClick() {
     const yahooFinanceUrl = rootUrl + "yhfinance/stocks/summary/?symbol=";
     var tickerSymbol = document.getElementById("tickerSymbol").value;
     var completeUrl = yahooFinanceUrl + tickerSymbol;
-    sendRequest(completeUrl);
+    sendGetRequest(completeUrl);
 }
 
 function alphaVantageClick() {
@@ -28,7 +28,7 @@ function alphaVantageClick() {
     const alphaVantageUrl = rootUrl + "alphavantage/stocks/daily-adjusted/?symbol=";
     var tickerSymbol = document.getElementById("tickerSymbol").value;
     var completeUrl = alphaVantageUrl + tickerSymbol;
-    sendRequest(completeUrl);
+    sendGetRequest(completeUrl);
 }
 
 function clock() {
@@ -109,45 +109,67 @@ function processStatistics(response) {
     console.log("Response: " + responseJson)
 }
 
-function sendRequest(url) {
+function sendGetRequest(url) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            console.log("Done.")
+            showLoading(false);
             processStatistics(xmlHttp.responseText);
         }
         else {
-            // TODO: Show loading symbol
-            console.log("Loading...")
+            showLoading(true);
         }
     }
     xmlHttp.open("GET", url, true);
     xmlHttp.send(null);
 }
 
+function showLoading(show) {
+    var statistics = document.getElementById("statistics")
+    var loading = document.getElementById("statistics-status")
+    if (show) {
+        loading.style.display = "block";
+        statistics.style.display = "none";
+    } else {
+        loading.style.display = "none";
+        statistics.style.display = "block"
+    }
+}
+
 function onRegisterClick() {
     console.log("Register")
 
     var tickerSymbol = document.getElementById("tickerSymbol").value;
-    console.log("Ticker: " + tickerSymbol)
 
     var isLowChecked = document.getElementById("lowCheckBox").checked;
     var lowAmount = document.getElementById("lowAmount").value;
 
-    console.log("Low Amount: " + lowAmount)
-
     var isHighChecked = document.getElementById("highCheckBox").checked;
     var highAmount = document.getElementById("highAmount").value;
 
-    console.log("High Amount: " + highAmount)
-
-    console.log("Low: " + isLowChecked)
-    console.log("High: " + isHighChecked)
-
     var email = document.getElementById("email").value;
-    console.log("Email: " + email)
+
+    var url = rootUrl + "notifications/email";
+    var message = "";
+    if (isLowChecked) {
+        message += "\nNotification for " + tickerSymbol + " at low for: " + lowAmount;
+    }
+    if (isHighChecked) {
+        message += "\nNotification for " + tickerSymbol + " at high for: " + highAmount;
+    }
+    var payload = {
+        "email": email,
+        "message": message
+    }
+    sendPostRequest(url, payload)
 }
 
-function sendConfirmationEmail() {
-
+function sendPostRequest(url, payload) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify({
+        "email": payload.email,
+        "message": payload.message
+    }));
 }

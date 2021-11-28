@@ -27,6 +27,10 @@ body {
   justify-content: space-evenly;
 }
 
+#statistics-status {
+  display: none;
+}
+
 .container {
   padding-top: 20px;
   margin: auto auto;
