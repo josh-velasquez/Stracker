@@ -52,10 +52,20 @@ function startStockMarketTimer(open) {
     }
 }
 
+function isHoliday(currentDateTime) {
+    var isHoliday = false;
+    // TODO: check if current day is a holiday
+    return isHoliday;
+}
+
+function isWeekend(currentDateTime) {
+    return currentDateTime.getDay() == 6 || currentDateTime.getDay() == 0;
+}
+
 function stockTimer() {
     var currentDateTime = new Date();
     var countDownDate = new Date(currentDateTime.getMonth() + " " + currentDateTime.getDate() + " " + currentDateTime.getFullYear() + " 14:00:00").getTime();
-    if (currentDateTime.getTime() > countDownDate) {
+    if (isWeekend(currentDateTime) || isHoliday(currentDateTime) || currentDateTime.getTime() > countDownDate) {
         startStockMarketTimer(false)
         return;
     }
@@ -102,8 +112,14 @@ function processStatistics(response) {
 function sendRequest(url) {
     var xmlHttp = new XMLHttpRequest();
     xmlHttp.onreadystatechange = function () {
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200)
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+            console.log("Done.")
             processStatistics(xmlHttp.responseText);
+        }
+        else {
+            // TODO: Show loading symbol
+            console.log("Loading...")
+        }
     }
     xmlHttp.open("GET", url, true);
     xmlHttp.send(null);
