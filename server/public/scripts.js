@@ -43,9 +43,10 @@ function clock() {
     }, 1000);
 }
 
-function startStockMarketTimer(open) {
+function showStockMarketTimer(open) {
     if (open) {
         stockMarketStatus.style.display = "none";
+        stockMarketTimer.style.display = "block";
     } else {
         stockMarketStatus.style.display = "block";
         stockMarketTimer.style.display = "none";
@@ -62,17 +63,10 @@ function isWeekend(currentDateTime) {
     return currentDateTime.getDay() == 6 || currentDateTime.getDay() == 0;
 }
 
-function stockTimer() {
-    var currentDateTime = new Date();
-    var countDownDate = new Date(currentDateTime.getMonth() + " " + currentDateTime.getDate() + " " + currentDateTime.getFullYear() + " 14:00:00").getTime();
-    if (isWeekend(currentDateTime) || isHoliday(currentDateTime) || currentDateTime.getTime() > countDownDate) {
-        startStockMarketTimer(false)
-        return;
-    }
-    startStockMarketTimer(true)
-    var x = setInterval(function () {
-        var now = new Date().getTime();
-        var distance = countDownDate - now;
+function startStockMarketTimer(countDownDate) {
+    var x = setInterval(function (...countDownDate) {
+        var now = new Date();
+        var distance = countDownDate - now.getTime();
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -80,10 +74,22 @@ function stockTimer() {
         timerMinutes.innerHTML = padTime(minutes);
         timerSeconds.innerHTML = padTime(seconds);
         if (distance < 0) {
-            startStockMarketTimer(false)
+            showStockMarketTimer(false)
             clearInterval(x);
         }
-    }, 1000);
+    }, 1000, countDownDate);
+}
+
+function stockTimer() {
+    var currentDateTime = new Date();
+    // have to increase month by 1 to get the correct coundown date
+    var countDownDate = new Date(currentDateTime.getFullYear() + " " + (currentDateTime.getMonth() + 1) + " " + currentDateTime.getDate() + " 14:00:00").getTime();
+    if (isWeekend(currentDateTime) || isHoliday(currentDateTime) || currentDateTime.getTime() > countDownDate) {
+        showStockMarketTimer(false)
+        return;
+    }
+    showStockMarketTimer(true)
+    startStockMarketTimer(countDownDate)
 }
 
 function padTime(t) {
@@ -105,8 +111,10 @@ function processStatistics(response) {
     currentPrice.value = responseJson.price.regularMarketPrice.raw;
     openPrice.value = responseJson.price.regularMarketOpen.raw;
     exchange.value = responseJson.price.exchangeName;
-    summary.value = responseJson.summaryProfile.longBusinessSummary;
-    console.log("Response: " + responseJson)
+    summary.innerHTML = responseJson.summaryProfile.longBusinessSummary;
+
+
+    // console.log("Response: " + responseJson)
 }
 
 function sendGetRequest(url) {
