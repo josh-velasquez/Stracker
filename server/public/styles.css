@@ -52,13 +52,13 @@ body {
   padding: 50px 10px;
 }
 
-.statistics-field {
+#statistics-field {
   text-align: center;
   color: whitesmoke;
   width: 100%;
   height: auto;
   flex-direction: column;
-  display: flex;
+  display: none;
   background-color: #2e2e2f;
   margin: auto 0;
 }
@@ -82,7 +82,7 @@ body {
   justify-content: center;
 }
 
-.statistics {
+#statistics {
   margin: auto auto;
   align-items: center;
   display: flex;
@@ -148,4 +148,12 @@ input[type="text"]:focus, textarea {
 .input-group-text {
   background-color: rgb(146, 146, 146);
   color: whitesmoke;
+}
+
+#summary {
+  text-align: left;
+}
+
+#symbol {
+  text-align: left;
 }

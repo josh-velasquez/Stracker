@@ -16,19 +16,28 @@ stockTimer();
 clock();
 
 function yahooFinanceClick() {
-    console.log("Yahoo Finance");
     const yahooFinanceUrl = rootUrl + "yhfinance/stocks/summary/?symbol=";
     var tickerSymbol = document.getElementById("tickerSymbol").value;
     var completeUrl = yahooFinanceUrl + tickerSymbol;
     sendGetRequest(completeUrl);
+    displayStatistics(true)
 }
 
 function alphaVantageClick() {
-    console.log("Alpha Vantage")
     const alphaVantageUrl = rootUrl + "alphavantage/stocks/daily-adjusted/?symbol=";
     var tickerSymbol = document.getElementById("tickerSymbol").value;
     var completeUrl = alphaVantageUrl + tickerSymbol;
+    displayStatistics(true)
     sendGetRequest(completeUrl);
+}
+
+function displayStatistics(display) {
+    var statisticsField = document.getElementById("statistics-field")
+    if (display) {
+        statisticsField.style.display = "flex";
+    } else {
+        statisticsField.style.display = "none";
+    }
 }
 
 function clock() {
@@ -75,7 +84,7 @@ function startStockMarketTimer(countDownDate) {
         timerSeconds.innerHTML = padTime(seconds);
         if (distance < 0) {
             showStockMarketTimer(false)
-            clearInterval(x);
+            clearInterval(x);   
         }
     }, 1000, countDownDate);
 }
@@ -106,15 +115,12 @@ function processStatistics(response) {
 
     var responseJson = JSON.parse(response)
 
-    stockSymbol.value = responseJson.symbol;
+    stockSymbol.innerHTML = responseJson.symbol;
     stockName.value = responseJson.price.shortName;
     currentPrice.value = responseJson.price.regularMarketPrice.raw;
     openPrice.value = responseJson.price.regularMarketOpen.raw;
     exchange.value = responseJson.price.exchangeName;
     summary.innerHTML = responseJson.summaryProfile.longBusinessSummary;
-
-
-    // console.log("Response: " + responseJson)
 }
 
 function sendGetRequest(url) {

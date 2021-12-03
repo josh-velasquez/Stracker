@@ -33,9 +33,12 @@ const email = config.strackerEmail;
 const password = config.strackerPassword;
 const transporter = nodemailer.createTransport({
   service: "gmail",
+  type: 'OAuth2',
   auth: {
     user: email,
     pass: password,
+    clientId: config.clientId,
+    clientSecret: config.clientSecret,
   },
 });
 

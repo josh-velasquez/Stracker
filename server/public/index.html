@@ -95,17 +95,13 @@
     <button class="btn btn-outline-secondary mx-auto" onclick="onRegisterClick()" type="button">Register</button>
   </div>
 
-  <div class="statistics-field">
-    <h3 style="padding-top: 50px;">Statistics</h3>
+  <div id="statistics-field">
+    <h3 style="padding-top: 50px; padding-bottom: 50px;">Statistics</h3>
     <div id="statistics-status">
       <img src="assets/loading.gif"/>
     </div>
-    <div id="statistics" class="statistics">
-      <div class="input-group mb-3">
-        <span class="input-group-text" id="basic-addon1">Symbol</span>
-        <input type="text" class="form-control" placeholder="Stock Ticker" id="symbol" aria-label="Name"
-          aria-describedby="basic-addon1">
-      </div>
+    <div id="statistics">
+      <h2 id="symbol"></h1>
       <div class="input-group mb-3">
         <span class="input-group-text" id="basic-addon1">Name</span>
         <input type="text" class="form-control" placeholder="Stock Name" id="stockName" aria-label="Name"
@@ -128,7 +124,6 @@
       </div>
       <div>
         <p id="summary">
-          This is a sample text
         </p>
       </div>
     </div>
