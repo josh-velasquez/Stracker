@@ -151,8 +151,6 @@ function showLoading(show) {
 }
 
 function onRegisterClick() {
-    console.log("Register")
-
     var tickerSymbol = document.getElementById("tickerSymbol").value;
 
     var isLowChecked = document.getElementById("lowCheckBox").checked;
@@ -164,16 +162,12 @@ function onRegisterClick() {
     var email = document.getElementById("email").value;
 
     var url = rootUrl + "notifications/email";
-    var message = "";
-    if (isLowChecked) {
-        message += "\nNotification for " + tickerSymbol + " at low for: " + lowAmount;
-    }
-    if (isHighChecked) {
-        message += "\nNotification for " + tickerSymbol + " at high for: " + highAmount;
-    }
+
     var payload = {
         "email": email,
-        "message": message
+        "stock": tickerSymbol,
+        "low": isLowChecked ? lowAmount : null,
+        "high": isHighChecked ? highAmount : null
     }
     sendPostRequest(url, payload)
 }
@@ -182,8 +176,5 @@ function sendPostRequest(url, payload) {
     var xhr = new XMLHttpRequest();
     xhr.open("POST", url, true);
     xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify({
-        "email": payload.email,
-        "message": payload.message
-    }));
+    xhr.send(JSON.stringify(payload));
 }

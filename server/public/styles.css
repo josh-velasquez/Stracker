@@ -50,6 +50,7 @@ body {
   justify-content: space-evenly;
   color: whitesmoke;
   padding: 50px 10px;
+  margin-bottom: 50px;
 }
 
 #statistics-field {

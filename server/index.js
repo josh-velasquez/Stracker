@@ -18,15 +18,72 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //#endregion
 
-automatedEmailNotification();
+const NOTIFICATION_INTERVAL = 300
+
+setInterval(automatedEmailNotification, NOTIFICATION_INTERVAL);
 
 app.get("/", (_, res) => {
   res.sendFile(dir + "/index.html");
 });
 
 function automatedEmailNotification() {
-
+  var usersToNotify = []
+  userNotifications.forEach(user => {
+    var result = shouldBeNotified()
+    if (result.notify) {
+      usersToNotify.push({
+        "email": user,
+        "stock": user.stock,
+        "message": result.message
+      })
+    }
+  });
+  notifyUsers(usersToNotify)
 }
+
+function shouldBeNotified() {
+  // TODO: query for stock here
+  return {
+    notify: true,
+    message: "Stock drop to 105!"
+  }
+}
+
+function notifyUsers(usersToNotify) {
+  var message = "Hello!\nWe have an update regarding the stock: " + 
+    usersToNotify.stock +
+    "\n" + usersToNotify.message +
+    "\n\nRegards, \nStracker Team";
+  var mail = {
+    from: email,
+    to: usersToNotify.email,
+    subject: "Project Stracker - Automated Email: Stock Update",
+    text: message
+  };
+  transporter.sendMail(mail, (error, _) => {
+    if (error) {
+      // res.status(500).send("Failed to send email: " + error);
+    } else {
+      // res.status(200).send("Email sent.");
+    }
+  });
+}
+
+var userNotifications = [
+  {
+    "email": "testing@email.com",
+    "stock": "AMD",
+    "low": 99,
+    "high": 130
+  },
+  {
+    "email": "test@gmail.com",
+    "stock": "AMD",
+    "low": 10,
+    "high": 105
+  }
+];
+
 
 //#region Email sender
 const email = config.strackerEmail;
@@ -44,22 +101,47 @@ const transporter = nodemailer.createTransport({
 
 app.post("/notifications/email", (req, res) => {
   console.log("Server Request: Email Notification");
-  console.log("EMAIL: " + req.body.email)
-  console.log("Message: " + req.body.message)
+  var userEmail = req.body.email;
+  var stock = req.body.stock;
+  var lowAmount = req.body.low !== null ? parseFloat(req.body.low) : null;
+  var highAmount = req.body.high !== null ? parseFloat(req.body.high) : null;
+  var message = "Hello!\nThank you for registering!" +
+        "\nYou will receive notifications regarding: " + stock;
+    if (lowAmount !== null) {
+        message += "\nLow for: " + lowAmount;
+    }
+    if (highAmount !== null) {
+        message += "\nHigh for: " + highAmount;
+    }
+
+    message += "\n\nRegards,\nStracker Team"
+
   var mail = {
     from: email,
-    to: req.body.email,
+    to: userEmail,
     subject: "Project Stracker - Automated Email",
-    text: req.body.message,
+    text: message
   };
   transporter.sendMail(mail, (error, _) => {
     if (error) {
       res.status(500).send("Failed to send email: " + error);
     } else {
       res.status(200).send("Email sent.");
+
+      // Add user for notification
+      addUserNotification({userEmail, stock, lowAmount, highAmount});
     }
   });
 })
+
+function addUserNotification(userInfo) {
+  userNotifications.push({
+    "email": userInfo.userEmail,
+    "stock": userInfo.stock,
+    "low": userInfo.lowAmount,
+    "high": userInfo.highAmount
+  })
+}
 //#endregion
 
 
