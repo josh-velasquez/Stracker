@@ -4,6 +4,7 @@ const path = require("path");
 const cors = require("cors");
 const axios = require("axios");
 const nodemailer = require("nodemailer");
+const cron = require("node-cron");
 const serverPort = 6060;
 
 //#region Setup
@@ -18,79 +19,146 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //#endregion
 
-const NOTIFICATION_INTERVAL = 300
+// const NOTIFICATION_INTERVAL = 10000;
 
-setInterval(automatedEmailNotification, NOTIFICATION_INTERVAL);
+// setInterval(automatedEmailNotification, NOTIFICATION_INTERVAL);
 
 app.get("/", (_, res) => {
   res.sendFile(dir + "/index.html");
 });
 
-function automatedEmailNotification() {
-  var usersToNotify = []
-  userNotifications.forEach(user => {
-    var result = shouldBeNotified()
-    if (result.notify) {
-      usersToNotify.push({
-        "email": user,
-        "stock": user.stock,
-        "message": result.message
-      })
+//#region Email notifier
+cron.schedule("10 * * * * *", () => {
+  console.log("Sending automated email notifications.");
+  automatedEmailNotification();
+});
+
+async function automatedEmailNotification() {
+  var usersToNotify = [];
+  for (const user of userNotifications) {
+    try {
+      var result = await shouldBeNotified(user.low, user.high, user.stock);
+      console.log(JSON.stringify(result));
+      if (result.notify) {
+        usersToNotify.push({
+          email: user.email,
+          stock: user.stock,
+          message: result.message,
+        });
+      }
+    } catch (ex) {
+      console.log("Failed to notify users.");
     }
-  });
-  notifyUsers(usersToNotify)
+  }
+  console.log(JSON.stringify(usersToNotify))
+  notifyUsers(usersToNotify);
 }
 
-function shouldBeNotified() {
-  // TODO: query for stock here
-  return {
-    notify: true,
-    message: "Stock drop to 105!"
+function shouldBeNotified(low, high, symbol) {
+  var options = {
+    method: "GET",
+    url: yhFinanceApiRootUrl + "/stock/v2/get-summary",
+    params: { symbol: symbol, region: "US" },
+    headers: {
+      "x-rapidapi-host": yhFinanceHost,
+      "x-rapidapi-key": yhFinanceApiKey,
+    },
+  };
+  return axios
+    .request(options)
+    .then((response) => {
+      var message = generateNotificationMessage(response.data, low, high);
+      if (message === "") {
+        return {
+          notify: false,
+          message: "No notifications."
+        }
+      }
+      return {
+        notify: true,
+        message: message,
+      };
+    })
+    .catch((error) => {
+      return {
+        notify: false,
+        message: "Error retrieving information: " + error,
+      };
+    });
+}
+
+function generateNotificationMessage(data, low, high) {
+  var currentPrice = parseFloat(data.price.regularMarketPrice.raw);
+  var message = "";
+  if (low !== null) {
+    if (currentPrice <= low) {
+      message +=
+        "This stock is lower than your target price.\n" +
+        "Your target price: " +
+        low +
+        "\n" +
+        "Current stock price: " +
+        currentPrice + "\n";
+    }
   }
+  if (high !== null) {
+    if (currentPrice >= high) {
+      message +=
+        "This stock is higher than your target price.\n" +
+        "Your target price: " +
+        high +
+        "\n" +
+        "Current stock price: " +
+        currentPrice + "\n";
+    }
+  }
+  return message;
 }
 
 function notifyUsers(usersToNotify) {
-  var message = "Hello!\nWe have an update regarding the stock: " + 
+  var message =
+    "Hello!\nWe have an update regarding the stock: " +
     usersToNotify.stock +
-    "\n" + usersToNotify.message +
+    "\n" +
+    usersToNotify.message +
     "\n\nRegards, \nStracker Team";
   var mail = {
     from: email,
     to: usersToNotify.email,
     subject: "Project Stracker - Automated Email: Stock Update",
-    text: message
+    text: message,
   };
   transporter.sendMail(mail, (error, _) => {
     if (error) {
-      // res.status(500).send("Failed to send email: " + error);
+      console.log("Failed to send email: " + error);
     } else {
-      // res.status(200).send("Email sent.");
+      console.log("Email sent.");
     }
   });
 }
+//#endregion
 
 var userNotifications = [
   {
-    "email": "testing@email.com",
-    "stock": "AMD",
-    "low": 99,
-    "high": 130
+    email: "joshvelasquez6@email.com",
+    stock: "AMD",
+    low: 99,
+    high: 130,
   },
   {
-    "email": "test@gmail.com",
-    "stock": "AMD",
-    "low": 10,
-    "high": 105
-  }
+    email: "anothertest@gmail.com",
+    stock: "AMD",
+    low: 700,
+    high: 1005,
+  },
 ];
-
 
 //#region Email sender
 const email = config.strackerEmail;
 const password = config.strackerPassword;
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  type: 'OAuth2',
+  type: "OAuth2",
   auth: {
     user: email,
     pass: password,
@@ -105,45 +173,50 @@ app.post("/notifications/email", (req, res) => {
   var stock = req.body.stock;
   var lowAmount = req.body.low !== null ? parseFloat(req.body.low) : null;
   var highAmount = req.body.high !== null ? parseFloat(req.body.high) : null;
-  var message = "Hello!\nThank you for registering!" +
-        "\nYou will receive notifications regarding: " + stock;
-    if (lowAmount !== null) {
-        message += "\nLow for: " + lowAmount;
-    }
-    if (highAmount !== null) {
-        message += "\nHigh for: " + highAmount;
-    }
+  var message =
+    "Hello!\nThank you for registering!" +
+    "\nYou will receive notifications regarding: " +
+    stock;
+  if (lowAmount !== null) {
+    message += "\nLow for: " + lowAmount;
+  }
+  if (highAmount !== null) {
+    message += "\nHigh for: " + highAmount;
+  }
 
-    message += "\n\nRegards,\nStracker Team"
+  message += "\n\nRegards,\nStracker Team";
 
   var mail = {
     from: email,
     to: userEmail,
     subject: "Project Stracker - Automated Email",
-    text: message
+    text: message,
   };
-  transporter.sendMail(mail, (error, _) => {
-    if (error) {
-      res.status(500).send("Failed to send email: " + error);
-    } else {
-      res.status(200).send("Email sent.");
+  try {
+    transporter.sendMail(mail, (error, _) => {
+      if (error) {
+        res.status(500).send("Failed to send email: " + error);
+      } else {
+        res.status(200).send("Email sent.");
 
-      // Add user for notification
-      addUserNotification({userEmail, stock, lowAmount, highAmount});
-    }
-  });
-})
+        // Add user for notification
+        addUserNotification({ userEmail, stock, lowAmount, highAmount });
+      }
+    });
+  } catch (ex) {
+    res.status.send("Failed to register notification. Exception: " + ex);
+  }
+});
 
 function addUserNotification(userInfo) {
   userNotifications.push({
-    "email": userInfo.userEmail,
-    "stock": userInfo.stock,
-    "low": userInfo.lowAmount,
-    "high": userInfo.highAmount
-  })
+    email: userInfo.userEmail,
+    stock: userInfo.stock,
+    low: userInfo.lowAmount,
+    high: userInfo.highAmount,
+  });
 }
 //#endregion
-
 
 //#region Yahoo Finance
 
@@ -152,7 +225,7 @@ const yhFinanceHost = "yh-finance.p.rapidapi.com";
 const yhFinanceApiKey = config.yhFinanceApiKey;
 
 app.get("/yhfinance/stocks/summary", (req, res) => {
-  console.log("Server Request: Yahoo Finance Summary")
+  console.log("Server Request: Yahoo Finance Summary");
   var symbol = req.query.symbol.toUpperCase();
   var options = {
     method: "GET",
@@ -198,17 +271,17 @@ app.get("/alphavantage/crypto/add-watch", (req, res) => {
   CRYPTO_WATCH.push(symbol);
 });
 
-app.delete("/alphavantage/crypto/delete-watch", (_, res) => { });
+app.delete("/alphavantage/crypto/delete-watch", (_, res) => {});
 
 app.get("/alphavantage/crypto/currency-exchange-rate", (req, res) => {
-  console.log("Server Request: Alpha Vantage Summary")
+  console.log("Server Request: Alpha Vantage Summary");
   var fromCurrency = req.query.fromCurrency.toUpperCase();
   var toCurrency = req.query.toCurrency.toUpperCase();
   console.log(
     "Server Request (CRYPTO): Currency_Exchange_Rate=" +
-    fromCurrency +
-    " to " +
-    toCurrency
+      fromCurrency +
+      " to " +
+      toCurrency
   );
   var url = buildExchangeRateUrl(
     CRYPTO_FUNCTIONS.CURRENCY_EXCHANGE_RATE,
@@ -301,7 +374,7 @@ function buildStocksUrl(
   return url;
 }
 
-function validateTicker(ticker) { }
+function validateTicker(ticker) {}
 
 function buildExchangeRateUrl(queryFunction, fromCurrency, toCurrency) {
   var url =
