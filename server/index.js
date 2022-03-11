@@ -8,6 +8,7 @@ const cron = require("node-cron");
 const serverPort = 6060;
 const AUTOMATED_NOTIFICATION_INTERVAL = 20;
 
+const config = require("./config.json");
 const email = config.automatedEmail;
 const password = config.automatedEmailPassword;
 const transporter = nodemailer.createTransport({
@@ -40,7 +41,6 @@ app.get("/", (_, res) => {
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-const config = require("./config.json");
 app.use(express.static(dir));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());

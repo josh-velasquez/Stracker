@@ -49,6 +49,7 @@ body {
   flex-direction: column;
   justify-content: space-evenly;
   color: whitesmoke;
+  padding-bottom: 10px;
 }
 
 .registration {
