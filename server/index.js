@@ -27,6 +27,9 @@ app.get("/", (_, res) => {
 
 //#region Email notifier
 cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * *`, () => {
+  if (email === "" || password === "") {
+    return;
+  }
   console.log("Sending automated email notifications.");
   automatedEmailNotification();
 });
@@ -135,19 +138,6 @@ var userNotifications = [
 ];
 
 //#region Email sender
-const email = config.strackerEmail;
-const password = config.strackerPassword;
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  type: "OAuth2",
-  auth: {
-    user: email,
-    pass: password,
-    clientId: config.clientId,
-    clientSecret: config.clientSecret,
-  },
-});
-
 app.post("/notifications/email", (req, res) => {
   console.log("Server Request: Email Notification");
   var userEmail = req.body.email;
