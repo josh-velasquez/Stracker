@@ -6,7 +6,6 @@ const axios = require("axios");
 const nodemailer = require("nodemailer");
 const cron = require("node-cron");
 const serverPort = 6060;
-
 const AUTOMATED_NOTIFICATION_INTERVAL = 20;
 
 const email = config.automatedEmail;
@@ -22,21 +21,30 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const dir = path.join(__dirname, "public");
+
+var userNotifications = [
+  {
+    email: "test@email.com",
+    stock: "AMD",
+    low: 99,
+    high: 130,
+  },
+];
+
+app.get("/", (_, res) => {
+  res.sendFile(dir + "/index.html");
+});
+
 //#region Setup
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 const config = require("./config.json");
-
-const dir = path.join(__dirname, "public");
 app.use(express.static(dir));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //#endregion
-
-app.get("/", (_, res) => {
-  res.sendFile(dir + "/index.html");
-});
 
 //#region Email notifier
 cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * *`, () => {
@@ -141,15 +149,6 @@ function notifyUsers(usersToNotify) {
 }
 //#endregion
 
-var userNotifications = [
-  {
-    email: "test@email.com",
-    stock: "AMD",
-    low: 99,
-    high: 130,
-  },
-];
-
 //#region Email sender
 app.post("/notifications/email", (req, res) => {
   console.log("Server Request: Email Notification");
@@ -182,8 +181,6 @@ app.post("/notifications/email", (req, res) => {
         res.status(500).send("Failed to send email: " + error);
       } else {
         res.status(200).send("Email sent.");
-
-        // Add user for notification
         addUserNotification({ userEmail, stock, lowAmount, highAmount });
       }
     });
@@ -203,7 +200,6 @@ function addUserNotification(userInfo) {
 //#endregion
 
 //#region Yahoo Finance
-
 const yhFinanceApiRootUrl = "https://yh-finance.p.rapidapi.com";
 const yhFinanceHost = "yh-finance.p.rapidapi.com";
 const yhFinanceApiKey = config.yhFinanceApiKey;
@@ -241,6 +237,8 @@ const alphaVantageApiKey = config.alphaVantageApiKey;
 app.get("/", (_, res) => {
   return res.status(200).send("Live");
 });
+
+//#endregion
 
 //#region Crypto
 const CRYPTO_WATCH = ["BTC", "ETH", "SHIB", "DOGE"];
