@@ -19,16 +19,14 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //#endregion
 
-// const NOTIFICATION_INTERVAL = 10000;
-
-// setInterval(automatedEmailNotification, NOTIFICATION_INTERVAL);
+const AUTOMATED_NOTIFICATION_INTERVAL = 10;
 
 app.get("/", (_, res) => {
   res.sendFile(dir + "/index.html");
 });
 
 //#region Email notifier
-cron.schedule("10 * * * * *", () => {
+cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * *`, () => {
   console.log("Sending automated email notifications.");
   automatedEmailNotification();
 });
@@ -38,7 +36,6 @@ async function automatedEmailNotification() {
   for (const user of userNotifications) {
     try {
       var result = await shouldBeNotified(user.low, user.high, user.stock);
-      console.log(JSON.stringify(result));
       if (result.notify) {
         usersToNotify.push({
           email: user.email,
@@ -50,8 +47,9 @@ async function automatedEmailNotification() {
       console.log("Failed to notify users.");
     }
   }
-  console.log(JSON.stringify(usersToNotify))
-  notifyUsers(usersToNotify);
+  usersToNotify.forEach((users) => {
+    notifyUsers(users);
+  });
 }
 
 function shouldBeNotified(low, high, symbol) {
@@ -67,17 +65,7 @@ function shouldBeNotified(low, high, symbol) {
   return axios
     .request(options)
     .then((response) => {
-      var message = generateNotificationMessage(response.data, low, high);
-      if (message === "") {
-        return {
-          notify: false,
-          message: "No notifications."
-        }
-      }
-      return {
-        notify: true,
-        message: message,
-      };
+      return generateNotificationMessage(response.data, low, high);
     })
     .catch((error) => {
       return {
@@ -89,30 +77,29 @@ function shouldBeNotified(low, high, symbol) {
 
 function generateNotificationMessage(data, low, high) {
   var currentPrice = parseFloat(data.price.regularMarketPrice.raw);
-  var message = "";
+  var notify = false;
+  var message = "Current stock price: " + currentPrice + "\n";
   if (low !== null) {
-    if (currentPrice <= low) {
+    if (low < currentPrice) {
+      notify = true;
       message +=
         "This stock is lower than your target price.\n" +
         "Your target price: " +
         low +
-        "\n" +
-        "Current stock price: " +
-        currentPrice + "\n";
+        "\n";
     }
   }
   if (high !== null) {
-    if (currentPrice >= high) {
+    if (high > currentPrice) {
+      notify = true;
       message +=
         "This stock is higher than your target price.\n" +
         "Your target price: " +
         high +
-        "\n" +
-        "Current stock price: " +
-        currentPrice + "\n";
+        "\n";
     }
   }
-  return message;
+  return { notify: notify, message: message };
 }
 
 function notifyUsers(usersToNotify) {
@@ -132,7 +119,7 @@ function notifyUsers(usersToNotify) {
     if (error) {
       console.log("Failed to send email: " + error);
     } else {
-      console.log("Email sent.");
+      console.log("Notification email sent.");
     }
   });
 }
@@ -140,16 +127,10 @@ function notifyUsers(usersToNotify) {
 
 var userNotifications = [
   {
-    email: "joshvelasquez6@email.com",
+    email: "test@email.com",
     stock: "AMD",
     low: 99,
     high: 130,
-  },
-  {
-    email: "anothertest@gmail.com",
-    stock: "AMD",
-    low: 700,
-    high: 1005,
   },
 ];
 
