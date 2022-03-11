@@ -7,18 +7,6 @@ const nodemailer = require("nodemailer");
 const cron = require("node-cron");
 const serverPort = 6060;
 
-//#region Setup
-app.use(cors());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-const config = require("./config.json");
-
-const dir = path.join(__dirname, "public");
-app.use(express.static(dir));
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
-//#endregion
-
 const AUTOMATED_NOTIFICATION_INTERVAL = 20;
 
 const email = config.automatedEmail;
@@ -34,12 +22,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+//#region Setup
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+const config = require("./config.json");
+
+const dir = path.join(__dirname, "public");
+app.use(express.static(dir));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+//#endregion
+
 app.get("/", (_, res) => {
   res.sendFile(dir + "/index.html");
 });
 
 //#region Email notifier
-cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * * *`, () => {
+cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * *`, () => {
   if (email === "" || password === "") {
     return;
   }

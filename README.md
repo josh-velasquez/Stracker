@@ -12,6 +12,6 @@ Running the server:
 There are some requirements for launching this API locally. Specifically, API keys from Yahoo Finance and Alpha Vantage are required to retrieve stock information. You can also provide an automated email sender to notify you for any updates on the stocks you wished to track. Just provide an email along with the password to auto send the email.
 
 ## Setting up automated email sender
-Currently, you can use gmail to create an automated emailer. If you do choose gmail as a provider, you just need to allow for [less secure apps](https://support.google.com/a/answer/6260879?hl=en) to allow for automated sending.
+Currently, it's using gmail as the main service. If you do choose gmail as a provider, you just need to allow for [less secure apps](https://support.google.com/a/answer/6260879?hl=en) to allow for automated sending.
 
 __Please ensure you include your config in the .gitignore__
