@@ -151,7 +151,7 @@ function showLoading(show) {
 }
 
 function onRegisterClick() {
-    var tickerSymbol = document.getElementById("tickerSymbol").value;
+    var tickerSymbol = document.getElementById("trackerTickerSymbol").value;
 
     var isLowChecked = document.getElementById("lowCheckBox").checked;
     var lowAmount = document.getElementById("lowAmount").value;

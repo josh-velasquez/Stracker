@@ -19,14 +19,27 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 //#endregion
 
-const AUTOMATED_NOTIFICATION_INTERVAL = 10;
+const AUTOMATED_NOTIFICATION_INTERVAL = 20;
+
+const email = config.automatedEmail;
+const password = config.automatedEmailPassword;
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  type: "OAuth2",
+  auth: {
+    user: email,
+    pass: password,
+    clientId: config.clientId,
+    clientSecret: config.clientSecret,
+  },
+});
 
 app.get("/", (_, res) => {
   res.sendFile(dir + "/index.html");
 });
 
 //#region Email notifier
-cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * *`, () => {
+cron.schedule(`${AUTOMATED_NOTIFICATION_INTERVAL} * * * * *`, () => {
   if (email === "" || password === "") {
     return;
   }

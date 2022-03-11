@@ -58,8 +58,15 @@
       <button class="btn btn-outline-secondary" onclick="alphaVantageClick()" type="button">Alpha Vantage</button>
     </div>
   </div>
-  <div class="container registration">
+  <div class="container trackStock">
+    <button class="btn btn-outline-secondary mx-auto" data-toggle="collapse" data-target="#registration" aria-expanded="false" aria-controls="registration" type="button">Track A Stock</button>
+  </div>
+  <div class="container registration collapse" id="registration">
     <h4>Notifications</h4>
+    <div class="input-group mb-3">
+      <input type="text" class="form-control" placeholder="Ticker Symbol" id="trackerTickerSymbol" aria-label="Ticker Symbol"
+      aria-describedby="basic-addon2">
+    </div>
     <div class="checkbox">
       <div class="form-check" style="margin-right: 20px; width: 65px;">
         <input class="form-check-input" type="checkbox" id="lowCheckBox">
@@ -89,7 +96,7 @@
 
     <div class="input-group mb-3">
       <span class="input-group-text" id="inputGroup-sizing-default">Email</span>
-      <input type="text" class="form-control" placeholder="email@example.com" aria-label="Sizing example input"
+      <input type="text" class="form-control" placeholder="email@example.com"
         aria-describedby="inputGroup-sizing-default" id="email">
     </div>
     <button class="btn btn-outline-secondary mx-auto" onclick="onRegisterClick()" type="button">Register</button>

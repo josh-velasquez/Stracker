@@ -44,12 +44,19 @@ body {
   align-items: center;
 }
 
+.trackStock {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  color: whitesmoke;
+}
+
 .registration {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   color: whitesmoke;
-  padding: 50px 10px;
+  padding-bottom: 50px;
   margin-bottom: 50px;
 }
 
